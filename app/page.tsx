@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Loader2 } from "lucide-react"
 
 type Message = {
   role: 'user' | 'assistant'
@@ -16,6 +17,8 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [sessionId, setSessionId] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setSessionId(Math.random().toString(36).substring(7))
@@ -23,8 +26,9 @@ export default function Home() {
 
   const sendMessage = async () => {
     if (inputMessage.trim()) {
+      setIsLoading(true)
       try {
-        const response = await axios.post('http://localhost:8000/chat', {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
           session_id: sessionId,
           message: inputMessage
         });
@@ -46,9 +50,18 @@ export default function Home() {
         } else {
           console.error('Unexpected error:', error);
         }
+      } finally {
+        setIsLoading(false)
+        scrollToBottom()
       }
     }
   };
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+    }
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -65,6 +78,11 @@ export default function Home() {
                 </p>
               </div>
             ))}
+            {isLoading && (
+              <div className="flex justify-center items-center h-8">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
+            )}
           </ScrollArea>
         </Card>
         <div className="flex w-full items-center space-x-2">
@@ -75,7 +93,13 @@ export default function Home() {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
           />
-          <Button className='bg-blue-600 text-white' onClick={sendMessage}>Send</Button>
+          <Button 
+            className='bg-blue-600 text-white hover:bg-blue-700' 
+            onClick={sendMessage}
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send'}
+          </Button>
         </div>
       </div>
     </main>

@@ -32,9 +32,9 @@ export default function Home() {
           session_id: sessionId,
           message: inputMessage
         });
-  
+
         console.log('Server response:', response.data);
-  
+
         setMessages(prevMessages => [
           ...prevMessages,
           { role: 'user', content: inputMessage },
@@ -64,15 +64,15 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
-        <h1 className="text-4xl font-bold mb-8">AnalyseDiss Chat</h1>
+    <main className="flex h-full mt-4 flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">AnalyseDiss Chat</h1>
         <Card className="mb-4">
-          <ScrollArea className="h-[400px] w-full p-4">
+          <ScrollArea className="h-[50vh] w-full p-2 sm:p-3 md:p-4" ref={scrollAreaRef}>
             {messages.map((message, index) => (
-              <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-blue-600' : 'text-green-600'}`}>
-                <p className="font-bold">{message.role === 'user' ? 'You' : 'Assistant'}:</p>
-                <p>{Array.isArray(message.content) 
+              <div key={index} className={`mb-3 ${message.role === 'user' ? 'text-blue-600' : 'text-green-600'}`}>
+                <p className="font-bold text-sm sm:text-base">{message.role === 'user' ? 'You' : 'Assistant'}:</p>
+                <p className="text-sm sm:text-base">{Array.isArray(message.content) 
                   ? message.content.map(item => item.text).join(' ') 
                   : message.content}
                 </p>
@@ -92,9 +92,10 @@ export default function Home() {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            className="text-sm sm:text-base"
           />
           <Button 
-            className='bg-blue-600 text-white hover:bg-blue-700' 
+            className='bg-blue-600 text-white hover:bg-blue-700 text-sm sm:text-base' 
             onClick={sendMessage}
             disabled={isLoading}
           >
